@@ -65,6 +65,64 @@ resource "aws_instance" "prod" {
   }
 }
 
+resource "aws_default_security_group" "default" {
+  vpc_id      = aws_vpc.prod.id
+
+  egress=[
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      security_groups = []
+      self = false
+      description = "all"
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      security_groups = []
+      self = false
+      description = "codedeploy agent"
+    }
+  ]
+
+  ingress = [
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      security_groups = []
+      self = false
+      description = "ssh"
+    },
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = []
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      security_groups = []
+      self = true
+      description = "vpc internal"
+    }
+  ]
+
+  tags = {
+    Name = "prod"
+  }
+}
+
 resource "aws_s3_bucket" "tfstate" {
   bucket = "undefineddev-tf-state"
 
